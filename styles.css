@@ -20,6 +20,100 @@ body {
     flex-direction: column;
     height: 100vh;
     width: 100vw;
+    font-family: var(--font);
+    background-color: #d3d3d3;
+}
+
+.startingInterface {
+    margin: 0;
+    padding: 2rem;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.startingInterface .submitButton {
+    color: white;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 15px;
+    text-transform: uppercase;
+    height: 2rem;
+    background-color: var(--dark-orange);
+    width: 100%;
+}
+
+.startingInterface .submitButton:hover {
+    background-color: var(--red);
+}
+
+.startingInterface .playerSelection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.playerSelection .selectionForm {
+    background-color: var(--middle-orange);
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    color: white;
+    border-radius: 15px;
+}
+
+.selectionForm h2 {
+    margin: 0.5rem;
+    font-size: 2rem;
+    text-transform: uppercase;
+}
+
+.selectionForm button {
+    flex: 1 1 auto;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 15px;
+    text-transform: uppercase;
+}
+
+.selectionForm button:hover {
+    color: white;
+    background-color: var(--black);
+}
+
+.selectionForm button.selected {
+    background-color: var(--black);
+    color: white;
+}
+
+.selectionForm input {
+    height: 2rem;
+    border: none;
+    outline: none;
+    padding: 5px;
+    border-radius: 15px;
+}
+
+.selectionForm input:focus {
+    border: 2px solid var(--red);
+}
+
+.selectionForm input {
+    display: none;
+    transition: 200ms ease-in-out;
+}
+
+.selectionForm input.active {
+    display: block;
+}
+
+.gameInterface {
+    display: none;
 }
 
 header,
