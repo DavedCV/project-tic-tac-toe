@@ -28,9 +28,13 @@ body {
     margin: 0;
     padding: 2rem;
     height: 100%;
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
+}
+
+.startingInterface.active {
+    display: flex;
 }
 
 .startingInterface .submitButton {
@@ -114,6 +118,11 @@ body {
 
 .gameInterface {
     display: none;
+}
+
+.gameInterface.active{
+    display: flex;
+    flex-direction: column;
 }
 
 header,
