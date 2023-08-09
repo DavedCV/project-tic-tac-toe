@@ -252,23 +252,27 @@ main .board-container {
 
 .board .tile {
     background-color: var(--ligter-blue);
-}
-
-.board .tile:hover {
-    background-color: var(--light-blue);
-}
-
-.board .tile.sign:hover {
     background-repeat: no-repeat;
-    background-size: 100%;
+    background-size: 80%;
     background-position: center;
+}
+
+.board .tile:hover:not(.sign) {
+    background-color: var(--light-blue);
     opacity: 0.8;
 }
 
-.board .tile.sign--x:hover {
+.board .tile.sign.sign--x {
+    background-image: url(./assets/xmark-solid.svg);
+}
+.board .tile.sign.sign--o {
+    background-image: url(./assets/o-solid.svg);
+}
+
+.board .tile.sign--x:not(.sign):hover {
     background-image: url(./assets/xmark-solid-white.svg);
 }
-.board .tile.sign--o:hover {
+.board .tile.sign--o:not(.sign):hover {
     background-image: url(./assets/o-solid-white.svg);
 }
 
