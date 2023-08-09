@@ -46,8 +46,22 @@ button {
     font-size: 1rem;
 }
 
-/* ----------------- game initializer section ------------------------------- */
+/* align the logo items and give them the proper sizing*/
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
+.logo i {
+    font-size: 5rem;
+}
+
+.logo i:last-of-type {
+    font-size: 4rem;
+}
+
+/* ----------------- game initializer section ------------------------------- */
 
 /*  Set the layout of the game initializer section */
 .game-initializer {
@@ -59,21 +73,6 @@ button {
     
     width: 100vw;
     height: 100vh;
-}
-
-/* align the logo items and give them the proper sizing*/
-.game-initializer .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.game-initializer .logo i {
-    font-size: 5rem;
-}
-
-.game-initializer .logo i:last-of-type {
-    font-size: 4rem;
 }
 
 /* style the container section of the player picker elements
@@ -173,6 +172,145 @@ button {
 }
 .game-initializer .start-button:hover {
     background-color: var(--darker-blue);
+}
+
+/* --------------------- main layout -----------------------------------------*/
+
+/* set the grid layout and main size of the main */
+main {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+
+    height: 100vh;
+    width: 100vw;
+}
+
+/* style the layout of the lateral info section bar*/
+main .game-info {
+    background-color: var(--dark-blue);
+    box-shadow: 5px 0 10px rgba(0,0,0,0.5);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+
+    font-size: 3rem;
+}
+
+/* style the square that displays the current player in turn*/
+.game-info h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    padding: 10px 20px;
+    background-color: var(--darker-blue);
+    border-radius: 2rem;
+}
+
+/* classes to change the player sign */
+.turn-info-sign.sign--x {
+    background-image: url(./assets/xmark-solid-white.svg);
+}
+.turn-info-sign.sign--o {
+    background-image: url(./assets/o-solid-white.svg);
+}
+.game-info .turn-info-sign {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    overflow: hidden;
+
+    height: 60px;
+    width: 60px;
+}
+
+/* give layout to the section that displays the current game info*/
+.game-info .stats-info {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    
+    height: 300px;
+    width: 70%;
+    
+    background-color: var(--darker-blue);
+    border-radius: 2rem;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+}
+
+
+/* style every entry that reflects the important stats*/
+.stats-info .stat {
+    height: 25%;
+    width: 60%;
+
+    background-color: var(--ligter-blue);
+    padding: 10px;
+    border-radius: 1rem;
+    
+    font-size: 1.5rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* display each player sign in an appropiate stat slot*/
+.stats-info .stat > div {
+    width: 100%;
+    
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+.stat .sign {
+    width: 20px;
+
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    overflow: hidden;
+}
+
+.stat .sign--x {
+    background-image: url(./assets/xmark-solid.svg);
+}
+
+.stat .sign--o {
+    background-image: url(./assets/o-solid.svg);
+}
+
+/* change the color of the font */
+.stat p{
+    color: black;
+    font-weight: bold;
+}
+
+/* style the reset game button */
+.game-info button {
+    width: 70px;
+    height: 70px;
+
+    background-color: var(--darker-blue);
+    border-radius: 3em;
+    border: none;
+
+    font-size: 3rem;
+
+    transition: all 0.3s ease;
+}
+
+/* give some style and animation when the button is hovered */
+.game-info button:hover {
+    background-color: var(--light-blue);
+    transform: rotate(-0.5turn);
 }
 
 /* JS dynamically added classes */

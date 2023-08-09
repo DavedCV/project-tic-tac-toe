@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,9 +13,63 @@
     <script src="./script.js" defer></script>
 
 </head>
+
 <body>
 
-    <section class="game-initializer">
+    <main class="">
+        <section class="game-info">
+            <div class="logo">
+                <i class="fa-solid fa-xmark fa-beat"></i>
+                <i class="fa-solid fa-o fa-beat"></i>
+            </div>
+
+            <h2 class="turn-info">
+                <section class="turn-info-sign sign--x"></section>Turn
+            </h2>
+
+            <section class="stats-info">
+                <section class="stat">
+                    <div>
+                        <p>Player</p>
+                        <section class="sign sign--x"></section>
+                    </div>
+                    <p>0</p>
+                </section>
+
+                <section class="stat">
+                    <p>Ties</p>
+                    <p>0</p>
+                </section>
+
+                <section class="stat">
+                    <div>
+                        <p>Player</p>
+                        <section class="sign sign--o"></section>
+                    </div>
+                    <p>0</p>
+                </section>
+
+            </section>
+
+            <button><i class="fa-solid fa-rotate-left"></i></button>
+        </section>
+
+        <section class="board-container">
+            <div class="board">
+                <div class="tile" data-index="1"></div>
+                <div class="tile" data-index="2"></div>
+                <div class="tile" data-index="3"></div>
+                <div class="tile" data-index="4"></div>
+                <div class="tile" data-index="5"></div>
+                <div class="tile" data-index="6"></div>
+                <div class="tile" data-index="7"></div>
+                <div class="tile" data-index="8"></div>
+                <div class="tile" data-index="9"></div>
+            </div>
+        </section>
+    </main>
+
+    <section class="game-initializer disabled">
         <div class="logo">
             <i class="fa-solid fa-xmark fa-beat"></i>
             <i class="fa-solid fa-o fa-beat"></i>
@@ -35,4 +90,5 @@
         <button class="start-button">Start Game</button>
     </section>
 </body>
+
 </html>
