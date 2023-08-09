@@ -168,7 +168,20 @@ button {
 
     outline: none;
     border: none;
+
+    transition: all 0.3s ease;
 }
 .game-initializer .start-button:hover {
     background-color: var(--darker-blue);
+}
+
+/* JS dynamically added classes */
+
+.clicked {
+    transform: scale(0.95) translateY(5px);
+    background-color: var(--darker-blue);
+}
+
+.disabled {
+    display: none;
 }
