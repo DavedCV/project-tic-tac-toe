@@ -1,3 +1,4 @@
+/* set the color scheme of the overall project*/
 :root {
     /* https://color.adobe.com/es/search?q=Happy&t=term */
     --darker-blue: #021F59;
@@ -15,6 +16,7 @@
     padding: 0;
 }
 
+/* globally set the box sizing and some font default styles */
 html {
     box-sizing: border-box;
     height: 100%;
@@ -25,56 +27,79 @@ html {
     color: white;
 }
 
+/* set the layout of the page with grid */ 
 body {
     height: 100%;
+    
     background-color: var(--ligter-blue);
+    
     display: grid;
     justify-content: center;
     align-content: center;
 }
 
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+/* general style of text in buttons */
+button {
+    font-weight: 700;
+    text-transform: inherit;
+    color: white;
+    font-size: 1rem;
 }
 
-.logo i {
-    font-size: 5rem;
-}
+/* ----------------- game initializer section ------------------------------- */
 
-.logo i:last-of-type {
-    font-size: 4rem;
-}
 
+/*  Set the layout of the game initializer section */
 .game-initializer {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 50px;
+    
     width: 100vw;
     height: 100vh;
 }
 
+/* align the logo items and give them the proper sizing*/
+.game-initializer .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.game-initializer .logo i {
+    font-size: 5rem;
+}
+
+.game-initializer .logo i:last-of-type {
+    font-size: 4rem;
+}
+
+/* style the container section of the player picker elements
+   and set the layout with grid */
 .game-initializer .player-picker {
-    background-color: var(--dark-blue);
-    height: 250px;
-    width: 50%;
-    border-radius: 1rem;
-    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.5);
     display: grid;
     grid-template-rows: 4rem 1fr;
     place-items: center;
-
+    
+    height: 250px;
+    width: 50%;
+    
+    background-color: var(--dark-blue);
+    border-radius: 1rem;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.5);
     font-size: 3rem;
 }
 
+/* Style the sign selector box and set some layout with grid*/ 
 .game-initializer .sign-selector {
     display: grid;
     grid-template-columns: 1fr 1fr;
+
     width: 80%;
     height: 80%;
+    
     border-radius: 1rem;
     overflow: hidden;
     background-color: var(--darker-blue);
@@ -82,14 +107,19 @@ body {
     position: relative;
 }
 
+/* Target the input radio buttons used to catch the sign */
 .game-initializer [class^="select-"] {
     appearance: none;
     outline: none;
     cursor: pointer;
+    
     position: absolute;
+    
     width: 50%;
     height: 100%;
 }
+
+/* position those elements relative to the box of the sign selector*/
 .game-initializer [class^="select-"]:first-of-type {
     left: 0;
 }
@@ -97,22 +127,28 @@ body {
     right: 0;
 }
 
+/* Use the element "section" to display the signs via SVG */
 .game-initializer .sign--x {
     background: url(./assets/xmark-solid.svg);
 }
 
+/* when the "x" sign is checked (radio button) change the background color */
 .game-initializer [class^="select-"]:first-of-type:checked ~ .sign--x {
     background-color: var(--light-blue);
 }
 
+/* Use the element "section" to display the signs via SVG */
 .game-initializer .sign--o {
     background: url(./assets/o-solid.svg);
 }
 
+/* when the "o" sign is checked (radio button) change the background color */
 .game-initializer [class^="select-"]:last-of-type:checked ~ .sign--o {
     background-color: var(--light-blue);
 }
 
+/* Set correctly the background image representation with "background" properties
+   and set a transition to animate the background-color change */
 .game-initializer .sign {
     background-position: center;
     background-repeat: no-repeat;
@@ -122,13 +158,7 @@ body {
     transition: 0.3s ease;
 }
 
-button {
-    font-weight: 700;
-    text-transform: inherit;
-    color: white;
-    font-size: 1rem;
-}
-
+/* give som style to the button of the game-initializer*/
 .game-initializer .start-button {
     height: 50px;
     width: 20%;
@@ -139,7 +169,6 @@ button {
     outline: none;
     border: none;
 }
-
 .game-initializer .start-button:hover {
     background-color: var(--darker-blue);
 }
