@@ -4,7 +4,7 @@
     --darker-blue: #021F59;
     --dark-blue: #024873;
     --ligter-blue: #66BCF2;
-    --light-blue: #66BCF2;
+    --light-blue: #3D90D9;
     --light-orange: #F2AD94;
 }
 
@@ -225,6 +225,51 @@ main .game-info {
 
     height: 60px;
     width: 60px;
+}
+
+
+/* Style the board */
+main .board-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.board-container .board {
+    background-color: var(--darker-blue);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    border-radius: 2rem;
+
+    width: 80%;
+    height: 80%;
+
+    padding: 2rem;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 0.5rem;
+}
+
+.board .tile {
+    background-color: var(--ligter-blue);
+}
+
+.board .tile:hover {
+    background-color: var(--light-blue);
+}
+
+.board .tile.sign:hover {
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-position: center;
+    opacity: 0.8;
+}
+
+.board .tile.sign--x:hover {
+    background-image: url(./assets/xmark-solid-white.svg);
+}
+.board .tile.sign--o:hover {
+    background-image: url(./assets/o-solid-white.svg);
 }
 
 /* give layout to the section that displays the current game info*/

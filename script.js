@@ -1,3 +1,21 @@
+const GameBoard = (() => {
+  const board = ["", "", "", "", "", "", "", "", ""];
+
+  const setPosition = (position, sign) => {
+    board[position - 1] = sign;
+  };
+
+  const getPosition = (position) => {
+    return board[position - 1];
+  };
+
+  const resetFields = () => {
+    board.forEach((entry, index, array) => (array[index] = ""));
+  };
+
+  return { getPosition, setPosition, resetFields };
+})();
+
 const layoutController = (function () {
   const gameInitializerButton = document.querySelector(
       ".game-initializer .start-button",
@@ -10,14 +28,13 @@ const layoutController = (function () {
     if (e.target.id === "sign-x") {
       firstPlayerSign = "x";
       secondPlayerSign = "o";
-    }else {
+    } else {
       firstPlayerSign = "o";
       secondPlayerSign = "x";
     }
   });
 
   gameInitializerButton.addEventListener("click", (e) => {
-
     if (firstPlayerSign === undefined) return;
 
     animateButton(e.target);
