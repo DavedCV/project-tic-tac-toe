@@ -1,0 +1,145 @@
+:root {
+    /* https://color.adobe.com/es/search?q=Happy&t=term */
+    --darker-blue: #021F59;
+    --dark-blue: #024873;
+    --ligter-blue: #66BCF2;
+    --light-blue: #66BCF2;
+    --light-orange: #F2AD94;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    box-sizing: border-box;
+    height: 100%;
+    
+    font-family: 'Handjet', cursive;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: white;
+}
+
+body {
+    height: 100%;
+    background-color: var(--ligter-blue);
+    display: grid;
+    justify-content: center;
+    align-content: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo i {
+    font-size: 5rem;
+}
+
+.logo i:last-of-type {
+    font-size: 4rem;
+}
+
+.game-initializer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    width: 100vw;
+    height: 100vh;
+}
+
+.game-initializer .player-picker {
+    background-color: var(--dark-blue);
+    height: 250px;
+    width: 50%;
+    border-radius: 1rem;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.5);
+    display: grid;
+    grid-template-rows: 4rem 1fr;
+    place-items: center;
+
+    font-size: 3rem;
+}
+
+.game-initializer .sign-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 80%;
+    height: 80%;
+    border-radius: 1rem;
+    overflow: hidden;
+    background-color: var(--darker-blue);
+    padding: 10px;
+    position: relative;
+}
+
+.game-initializer [class^="select-"] {
+    appearance: none;
+    outline: none;
+    cursor: pointer;
+    position: absolute;
+    width: 50%;
+    height: 100%;
+}
+.game-initializer [class^="select-"]:first-of-type {
+    left: 0;
+}
+.game-initializer [class^="select-"]:last-of-type {
+    right: 0;
+}
+
+.game-initializer .sign--x {
+    background: url(./assets/xmark-solid.svg);
+}
+
+.game-initializer [class^="select-"]:first-of-type:checked ~ .sign--x {
+    background-color: var(--light-blue);
+}
+
+.game-initializer .sign--o {
+    background: url(./assets/o-solid.svg);
+}
+
+.game-initializer [class^="select-"]:last-of-type:checked ~ .sign--o {
+    background-color: var(--light-blue);
+}
+
+.game-initializer .sign {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 40% 100%;
+    overflow: hidden;
+    border-radius: 1rem;
+    transition: 0.3s ease;
+}
+
+button {
+    font-weight: 700;
+    text-transform: inherit;
+    color: white;
+    font-size: 1rem;
+}
+
+.game-initializer .start-button {
+    height: 50px;
+    width: 20%;
+    border-radius: 1rem;
+    box-shadow: inset 0 -3px 2px rgba(0, 0, 0, 0.3);
+    background-color: var(--dark-blue);    
+
+    outline: none;
+    border: none;
+}
+
+.game-initializer .start-button:hover {
+    background-color: var(--darker-blue);
+}
