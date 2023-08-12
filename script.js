@@ -1,3 +1,5 @@
+/* Module that represents the game board and mantains its state through
+every round */
 const GameBoard = (() => {
   const board = ["", "", "", "", "", "", "", "", ""];
 
@@ -16,48 +18,65 @@ const GameBoard = (() => {
   return { getPosition, setPosition, resetFields };
 })();
 
+/* Factory functions to construct Player objects and keep track 
+of the data that represents it */
 const Player = (playerName, playerSign) => {
   const sign = playerSign;
   const name = playerName;
 
-  let tries = 0;
   let winningRounds = 0;
 
   const getName = () => name;
   const getSign = () => sign;
-  const getTries = () => tries;
-  const updateTries = () => tries++;
   const getWinningRounds = () => winningRounds;
   const updateWinningRounds = () => winningRounds++;
 
   return {
     getSign,
-    getTries,
-    updateTries,
     getName,
     getWinningRounds,
     updateWinningRounds,
   };
 };
 
+/* Module that is in charge of the DOM manipulation through the game */
 const layoutController = (function () {
+  // ------------------------- module variables --------------------------------
+
   const gameInitializerButton = document.querySelector(
       ".game-initializer .start-button",
     ),
     signSelector = document.querySelector(".game-initializer .sign-selector"),
     mainLayout = document.querySelector("main"),
     turnInfo = mainLayout.querySelector(".turn-info"),
+    statsInfo = mainLayout.querySelector(".stats-info"),
+    infoRound = document.querySelector(".round-info"),
+    buttonNextMatch = infoRound.querySelector(".next-match"),
     tiles = [...mainLayout.querySelectorAll(".tile")],
     board = mainLayout.querySelector(".board"),
-    overlay = document.querySelector(".overlay"),
-    infoRound = document.querySelector(".round-info");
+    overlay = document.querySelector(".overlay");
 
-  let firstPlayerSign,
-    secondPlayerSign,
-    firstPlayerName = "",
-    secondPlayerName = "";
+  // variables to keep track of the sign of the selected player in the start menu
+  let startSignSelection = "";
+
+  // -------------------------- event listeners --------------------------------
 
   signSelector.addEventListener("click", (e) => {
+    if (e.target.id === "sign-x") startSignSelection = "x";
+    else startSignSelection = "o";
+  });
+
+  // listener to the button that start the interaction between the layout manager
+  // and the game manager
+  gameInitializerButton.addEventListener("click", (e) => {
+    if (startSignSelection === undefined) return;
+
+    // get the appropiate data for the players
+    let firstPlayerSign,
+      secondPlayerSign,
+      firstPlayerName = "",
+      secondPlayerName = "";
+
     if (e.target.id === "sign-x") {
       firstPlayerSign = "x";
       secondPlayerSign = "o";
@@ -65,74 +84,93 @@ const layoutController = (function () {
       firstPlayerSign = "o";
       secondPlayerSign = "x";
     }
-  });
 
-  gameInitializerButton.addEventListener("click", (e) => {
-    if (firstPlayerSign === undefined) return;
-
-    const firstPlayer = gameManager.setPlayers(
+    // create the player instances via the game manager, and start altering the
+    // DOM based on the random selection of the first player
+    gameManager.setPlayers(
       firstPlayerName,
       firstPlayerSign,
       secondPlayerName,
       secondPlayerSign,
     );
 
-    updatePlayerData(firstPlayer);
     addEventListenerBoard();
 
     animateButton(e.target);
 
+    // remove the start section and show the actual game section
     setTimeout(() => {
       e.target.parentElement.classList.add("disabled");
       mainLayout.classList.remove("disabled");
     }, 500);
   });
 
+  // event listener to the next round button present on the round information box
+  // displayed after game finalization
+  buttonNextMatch.addEventListener("click", () => {
+    closeInfoRoundBox();
+    tiles.forEach((tile) => tile.setAttribute("class", "tile"));
+    gameManager.nextMatch();
+  });
+
+  // methods to bind and unbind event listeners of the board when is necessary
+  const addEventListenerBoard = () => {
+    board.addEventListener("click", playRound);
+  };
+  const deleteEventListenerBoard = () => {
+    board.removeEventListener("click", playRound);
+  };
+
+  // -------------------------------- module methods ---------------------------
+
+  // method to animate when clicked some DOM elements
+  const animateButton = (element) => {
+    function removeTransition(e) {
+      if (e.propertyName !== "transform") return;
+      element.classList.remove("clicked");
+    }
+
+    element.classList.add("clicked");
+    element.addEventListener("transitionend", removeTransition);
+  };
+
+  // methods to open and close the info round box, based on the game state
   const openInfoRoundBox = () => {
     infoRound.classList.add("active");
     overlay.classList.add("active");
   };
-
   const closeInfoRoundBox = () => {
     infoRound.classList.remove("active");
     overlay.classList.remove("active");
   };
 
+  // method to mark a specific tile and play a round of the game
   const playRound = (e) => {
     if (
       !e.target.classList.contains("tile") ||
       e.target.classList.contains("sign")
     )
       return;
+
+    markTile(e.target);
     gameManager.playRound(e.target);
   };
 
-  const addEventListenerBoard = () => {
-    board.addEventListener("click", playRound);
+  const markTile = (tile) => {
+    animateButton(tile);
+    tile.classList.add("sign");
   };
 
-  const deleteEventListenerBoard = () => {
-    board.removeEventListener("click", playRound);
-  };
-
-  const animateButton = (button) => {
-    function removeTransition(e) {
-      if (e.propertyName !== "transform") return;
-      button.classList.remove("clicked");
-    }
-
-    button.classList.add("clicked");
-    button.addEventListener("transitionend", removeTransition);
-  };
-
-  const updatePlayerData = (player) => {
-    const signClass = player.getSign() === "o" ? "sign--o" : "sign--x";
-    const notSignClass = player.getSign() === "o" ? "sign--x" : "sign--o";
+  // method to update the data of the board and the info pane, based on the
+  // data of the round player (change the signs showed in the board)
+  const updatePlayerData = (playerSign, playerName) => {
+    const signClass = playerSign === "o" ? "sign--o" : "sign--x";
+    const notSignClass = playerSign === "o" ? "sign--x" : "sign--o";
 
     turnInfo
       .querySelector(".turn-info-sign")
       .setAttribute("class", `turn-info-sign ${signClass}`);
-    turnInfo.querySelector("p").textContent = player.getName();
+    turnInfo.querySelector("p").textContent = playerName;
 
     tiles.forEach((tile) => {
       if (!tile.classList.contains("sign")) {
@@ -143,12 +181,16 @@ const layoutController = (function () {
     });
   };
 
-  const markTile = (tile, sign) => {
-    const signClass = sign === "o" ? "sign--o" : "sign--x";
-    animateButton(tile);
-    tile.classList.add("sign");
+  // method used to modify the counter of the stats of all games
+  const updateStatsInfo = (player1Rounds, player2Rounds, tiesNumber) => {
+    statsInfo.querySelector(".stat.sign--x > p:last-of-type").textContent =
+      player1Rounds;
+    statsInfo.querySelector(".stat.sign--o > p:last-of-type").textContent =
+      player2Rounds;
+    statsInfo.querySelector(".stat.ties > p:last-of-type").textContent = tiesNumber;
   };
 
+  // method use to color the tiles of a winning game
   const colorWinningGame = (winningGame) => {
     const targetTiles = tiles.filter((tile) =>
       winningGame.includes(Number(tile.dataset.index)),
@@ -157,19 +199,29 @@ const layoutController = (function () {
   };
 
   return {
-    markTile,
     updatePlayerData,
+    updateStatsInfo,
     colorWinningGame,
+    addEventListenerBoard,
     deleteEventListenerBoard,
     openInfoRoundBox,
   };
 })();
 
+/* Module that manages the general flow of the game and connect the DOM interface
+to the game board representation */
 const gameManager = (function () {
+  // ---------------------------- module variables -----------------------------
+
   let player1, player2, playerRound;
-  let round = 0;
+  let matchNumber = 0;
+  let tiesNumber = 0;
   let move = 0;
 
+  // ------------------------------ module methods -----------------------------
+
+  // method to create the instances of the players and randomly select
+  // the first player
   const setPlayers = (firstName, firstSign, secondName, secondSign) => {
     if (firstName === "") player1 = Player("HUMAN", firstSign);
     else player1 = Player(firstName, firstSign);
@@ -178,22 +230,19 @@ const gameManager = (function () {
     else player2 = Player(secondName, secondSign);
 
     firstMove();
-    return playerRound;
+    layoutController.updatePlayerData(playerRound.getSign(), playerRound.getName());
   };
-
   const firstMove = () => {
     playerRound = Math.random() >= 0.5 ? player1 : player2;
   };
 
+  // method to play a round and update the info of the players, the game board,
+  // and check the general state of the match
   const playRound = (tile) => {
-    const indexTile = Number(tile.dataset.index);
-
-    GameBoard.setPosition(indexTile, playerRound.getSign());
-
     move++;
-    playerRound.updateTries();
 
-    layoutController.markTile(tile, playerRound.getSign());
+    const indexTile = Number(tile.dataset.index);
+    GameBoard.setPosition(indexTile, playerRound.getSign());
 
     const endRound = checkGameState(move, indexTile, playerRound.getSign());
     if (endRound) {
@@ -202,10 +251,11 @@ const gameManager = (function () {
     }
 
     playerRound = playerRound == player1 ? player2 : player1;
-    layoutController.updatePlayerData(playerRound);
+    layoutController.updatePlayerData(playerRound.getSign(), playerRound.getName());
   };
 
-  const checkGameState = (move, indexTile) => {
+  // method to check the game state after every move
+  const checkGameState = (movesNumber, indexTile) => {
     const winningCombinations = [
       [1, 2, 3],
       [4, 5, 6],
@@ -216,8 +266,9 @@ const gameManager = (function () {
       [1, 5, 9],
       [3, 5, 7],
     ];
-
     let finalRound = false;
+    let winnigGame = false;
+
     const possibilities = winningCombinations.filter((poss) =>
       poss.includes(indexTile),
     );
@@ -229,16 +280,41 @@ const gameManager = (function () {
         )
       ) {
         finalRound = true;
+        winnigGame= true;
         playerRound.updateWinningRounds();
         layoutController.colorWinningGame(poss);
         break;
       }
     }
 
-    if (move === 9) finalRound = true;
+    if (movesNumber === 9) {
+      if (!winnigGame) tiesNumber++;
+      finalRound = true;
+    };
 
     return finalRound;
   };
 
-  return { setPlayers, playRound };
+  // method to start the next match and reset some values
+  const nextMatch = () => {
+    firstMove();
+
+    let xSignPlayerRounds, oSignPlayerRounds;
+    if (player1.getSign() === "x") {
+      xSignPlayerRounds = player1.getWinningRounds();
+      oSignPlayerRounds = player2.getWinningRounds();
+    } else {
+      oSignPlayerRounds = player1.getWinningRounds();
+      xSignPlayerRounds = player2.getWinningRounds();
+    }
+    layoutController.updateStatsInfo(xSignPlayerRounds, oSignPlayerRounds, tiesNumber);
+
+    layoutController.updatePlayerData(playerRound.getSign(), playerRound.getName());
+    layoutController.addEventListenerBoard();
+    GameBoard.resetFields();
+    move = 0;
+    matchNumber++;
+  };
+
+  return { setPlayers, playRound, nextMatch };
 })();
