@@ -43,15 +43,18 @@ const Player = (playerName, playerSign) => {
 const layoutController = (function () {
   // ------------------------- module variables --------------------------------
 
-  const gameInitializerButton = document.querySelector(
+  const gameInitializer = document.querySelector(".game-initializer"),
+    gameInitializerButton = document.querySelector(
       ".game-initializer .start-button",
     ),
     signSelector = document.querySelector(".game-initializer .sign-selector"),
     mainLayout = document.querySelector("main"),
     turnInfo = mainLayout.querySelector(".turn-info"),
+    turnInfoFinishAll = document.querySelector(".game-info > button"),
     statsInfo = mainLayout.querySelector(".stats-info"),
     infoRound = document.querySelector(".round-info"),
     buttonNextMatch = infoRound.querySelector(".next-match"),
+    buttonFinishAll = infoRound.querySelector(".finish-all"),
     tiles = [...mainLayout.querySelectorAll(".tile")],
     board = mainLayout.querySelector(".board"),
     overlay = document.querySelector(".overlay");
@@ -100,7 +103,7 @@ const layoutController = (function () {
 
     // remove the start section and show the actual game section
     setTimeout(() => {
-      e.target.parentElement.classList.add("disabled");
+      gameInitializer.classList.add("disabled");
       mainLayout.classList.remove("disabled");
     }, 500);
   });
@@ -112,6 +115,18 @@ const layoutController = (function () {
     tiles.forEach((tile) => tile.setAttribute("class", "tile"));
     gameManager.nextMatch();
   });
+
+  // callback function to reset the game when a button with this objective is clicked
+  const finishAll = () => {
+    closeInfoRoundBox();
+    tiles.forEach((tile) => tile.setAttribute("class", "tile"));
+    gameManager.resetGame();
+    mainLayout.classList.add("disabled");
+    gameInitializer.classList.remove("disabled");
+  };
+
+  buttonFinishAll.addEventListener("click", finishAll);
+  turnInfoFinishAll.addEventListener("click", finishAll);
 
   // methods to bind and unbind event listeners of the board when is necessary
   const addEventListenerBoard = () => {
@@ -187,7 +202,8 @@ const layoutController = (function () {
       player1Rounds;
     statsInfo.querySelector(".stat.sign--o > p:last-of-type").textContent =
       player2Rounds;
-    statsInfo.querySelector(".stat.ties > p:last-of-type").textContent = tiesNumber;
+    statsInfo.querySelector(".stat.ties > p:last-of-type").textContent =
+      tiesNumber;
   };
 
   // method use to color the tiles of a winning game
@@ -230,7 +246,10 @@ const gameManager = (function () {
     else player2 = Player(secondName, secondSign);
 
     firstMove();
-    layoutController.updatePlayerData(playerRound.getSign(), playerRound.getName());
+    layoutController.updatePlayerData(
+      playerRound.getSign(),
+      playerRound.getName(),
+    );
   };
   const firstMove = () => {
     playerRound = Math.random() >= 0.5 ? player1 : player2;
@@ -251,7 +270,10 @@ const gameManager = (function () {
     }
 
     playerRound = playerRound == player1 ? player2 : player1;
-    layoutController.updatePlayerData(playerRound.getSign(), playerRound.getName());
+    layoutController.updatePlayerData(
+      playerRound.getSign(),
+      playerRound.getName(),
+    );
   };
 
   // method to check the game state after every move
@@ -280,7 +302,7 @@ const gameManager = (function () {
         )
       ) {
         finalRound = true;
-        winnigGame= true;
+        winnigGame = true;
         playerRound.updateWinningRounds();
         layoutController.colorWinningGame(poss);
         break;
@@ -290,7 +312,7 @@ const gameManager = (function () {
     if (movesNumber === 9) {
       if (!winnigGame) tiesNumber++;
       finalRound = true;
-    };
+    }
 
     return finalRound;
   };
@@ -307,14 +329,28 @@ const gameManager = (function () {
       oSignPlayerRounds = player1.getWinningRounds();
       xSignPlayerRounds = player2.getWinningRounds();
     }
-    layoutController.updateStatsInfo(xSignPlayerRounds, oSignPlayerRounds, tiesNumber);
+    layoutController.updateStatsInfo(
+      xSignPlayerRounds,
+      oSignPlayerRounds,
+      tiesNumber,
+    );
 
-    layoutController.updatePlayerData(playerRound.getSign(), playerRound.getName());
+    layoutController.updatePlayerData(
+      playerRound.getSign(),
+      playerRound.getName(),
+    );
     layoutController.addEventListenerBoard();
     GameBoard.resetFields();
     move = 0;
     matchNumber++;
   };
 
-  return { setPlayers, playRound, nextMatch };
+  const resetGame = () => {
+    player1 = player2 = playerRound = null;
+    matchNumber = tiesNumber = move = 0;
+    GameBoard.resetFields();
+    layoutController.updateStatsInfo(0, 0, 0);
+  };
+
+  return { setPlayers, playRound, nextMatch, resetGame };
 })();
