@@ -21,13 +21,23 @@ const Player = (playerName, playerSign) => {
   const name = playerName;
 
   let tries = 0;
+  let winningRounds = 0;
 
   const getName = () => name;
   const getSign = () => sign;
   const getTries = () => tries;
   const updateTries = () => tries++;
+  const getWinningRounds = () => winningRounds;
+  const updateWinningRounds = () => winningRounds++;
 
-  return { getSign, getTries, updateTries, getName };
+  return {
+    getSign,
+    getTries,
+    updateTries,
+    getName,
+    getWinningRounds,
+    updateWinningRounds,
+  };
 };
 
 const layoutController = (function () {
@@ -37,12 +47,22 @@ const layoutController = (function () {
     signSelector = document.querySelector(".game-initializer .sign-selector"),
     mainLayout = document.querySelector("main"),
     turnInfo = mainLayout.querySelector(".turn-info"),
-    tiles = mainLayout.querySelectorAll(".tile");
+    tiles = [...mainLayout.querySelectorAll(".tile")],
+    board = mainLayout.querySelector(".board");
 
   let firstPlayerSign,
     secondPlayerSign,
     firstPlayerName = "",
     secondPlayerName = "";
+
+  board.addEventListener("click", (e) => {
+    if (
+      !e.target.classList.contains("tile") ||
+      e.target.classList.contains("sign")
+    )
+      return;
+    gameManager.playRound(e.target);
+  });
 
   signSelector.addEventListener("click", (e) => {
     if (e.target.id === "sign-x") {
@@ -86,27 +106,43 @@ const layoutController = (function () {
 
   const updatePlayerData = (player) => {
     const signClass = player.getSign() === "o" ? "sign--o" : "sign--x";
-    const notSignClass = player.getSign() === "o" ? "sign--x" : "sign--o"
+    const notSignClass = player.getSign() === "o" ? "sign--x" : "sign--o";
 
     turnInfo
       .querySelector(".turn-info-sign")
       .setAttribute("class", `turn-info-sign ${signClass}`);
     turnInfo.querySelector("p").textContent = player.getName();
 
-    tiles.forEach(tile => {
-      if (!tile.classList.contains("sign")){
-        if (tile.classList.contains(notSignClass)) tile.classList.remove(notSignClass);
+    tiles.forEach((tile) => {
+      if (!tile.classList.contains("sign")) {
+        if (tile.classList.contains(notSignClass))
+          tile.classList.remove(notSignClass);
         tile.classList.add(signClass);
       }
     });
   };
 
-  return {};
+  const markTile = (tile, sign) => {
+    const signClass = sign === "o" ? "sign--o" : "sign--x";
+    animateButton(tile);
+    tile.classList.add("sign");
+  };
+
+  const colorWinningGame = (winningGame) => {
+    console.log(winningGame);
+    const targetTiles = tiles.filter((tile) =>
+      winningGame.includes(Number(tile.dataset.index)),
+    );
+    targetTiles.forEach((tile) => tile.classList.add("winning-tile"));
+  };
+
+  return { markTile, updatePlayerData, colorWinningGame };
 })();
 
 const gameManager = (function () {
   let player1, player2, playerRound;
   let round = 0;
+  let move = 0;
 
   const setPlayers = (firstName, firstSign, secondName, secondSign) => {
     if (firstName === "") player1 = Player("HUMAN", firstSign);
@@ -123,7 +159,56 @@ const gameManager = (function () {
     playerRound = Math.random() >= 0.5 ? player1 : player2;
   };
 
-  const playRound = () => {};
+  const playRound = (tile) => {
+    const indexTile = Number(tile.dataset.index);
 
-  return { setPlayers };
+    GameBoard.setPosition(indexTile, playerRound.getSign());
+
+    move++;
+    playerRound.updateTries();
+
+    layoutController.markTile(tile, playerRound.getSign());
+
+    endRound = checkGameState(move, indexTile, playerRound.getSign());
+
+    playerRound = playerRound == player1 ? player2 : player1;
+    layoutController.updatePlayerData(playerRound);
+  };
+
+  const checkGameState = (move, indexTile) => {
+    const winningCombinations = [
+      [1, 2, 3],
+      [4, 5, 6],
+      [7, 8, 9],
+      [1, 4, 7],
+      [2, 5, 8],
+      [3, 6, 9],
+      [1, 5, 9],
+      [3, 5, 7],
+    ];
+
+    let finalRound = false;
+    const possibilities = winningCombinations.filter((poss) =>
+      poss.includes(indexTile),
+    );
+
+    for (let poss of possibilities) {
+      if (
+        poss.every(
+          (index) => GameBoard.getPosition(index) === playerRound.getSign(),
+        )
+      ) {
+        finalRound = true;
+        playerRound.updateWinningRounds();
+        layoutController.colorWinningGame(poss);
+        break;
+      }
+    }
+
+    if (move === 9) finalRound = true;
+
+    return finalRound;
+  };
+
+  return { setPlayers, playRound };
 })();

@@ -255,6 +255,8 @@ main .board-container {
     background-repeat: no-repeat;
     background-size: 80%;
     background-position: center;
+
+    transition: all 0.3s ease;
 }
 
 .board .tile:hover:not(.sign) {
@@ -274,6 +276,10 @@ main .board-container {
 }
 .board .tile.sign--o:not(.sign):hover {
     background-image: url(./assets/o-solid-white.svg);
+}
+
+.tile.winning-tile{
+    background-color: var(--light-orange);
 }
 
 /* give layout to the section that displays the current game info*/
