@@ -378,7 +378,7 @@ main .board-container {
     background-color: var(--light-blue);
 
     width: 500px;
-    height: 300px;
+    padding: 1rem;
 
     border-radius: 2rem;
 
@@ -441,6 +441,38 @@ main .board-container {
 
 .round-info-buttons > button:hover {
     background-color: var(--darker-blue);
+}
+
+.round-info-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.round-info-text > div {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.round-info-text .winner-round-sign.sign--x {
+    background-image: url(./assets/xmark-solid-white.svg);
+    height: 40px;
+    width: 40px;
+}
+.round-info-text .winner-round-sign.sign--o {
+    background-image: url(./assets/o-solid-white.svg);
+    height: 40px;
+    width: 40px;
+}
+
+.round-info-text .winner-round-sign {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    overflow: hidden;
 }
 
 /*-------------------- JS dynamically added classes --------------------------*/

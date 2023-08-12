@@ -150,9 +150,31 @@ const layoutController = (function () {
   };
 
   // methods to open and close the info round box, based on the game state
-  const openInfoRoundBox = () => {
+  const openInfoRoundBox = (tie, playerName, playerSign) => {
     infoRound.classList.add("active");
     overlay.classList.add("active");
+
+    if (tie) {
+      infoRound.querySelector(".round-info-text > p").textContent =
+        "It's a Tie!";
+
+      infoRound
+        .querySelector(".round-info-text .winner-round-sign")
+        .setAttribute("class", "winner-round-sign");
+
+      infoRound.querySelector(".round-info-text > div > p").textContent = "";
+    } else {
+      const signClass = playerSign === "o" ? "sign--o" : "sign--x";
+      infoRound
+        .querySelector(".round-info-text .winner-round-sign")
+        .setAttribute("class", `winner-round-sign ${signClass}`);
+
+      infoRound.querySelector(".round-info-text > div > p").textContent =
+        playerName;
+
+      infoRound.querySelector(".round-info-text > p").textContent =
+        "It's the winner!";
+    }
   };
   const closeInfoRoundBox = () => {
     infoRound.classList.remove("active");
@@ -232,6 +254,7 @@ const gameManager = (function () {
   let player1, player2, playerRound;
   let matchNumber = 0;
   let tiesNumber = 0;
+  let tie = false;
   let move = 0;
 
   // ------------------------------ module methods -----------------------------
@@ -266,7 +289,15 @@ const gameManager = (function () {
     const endRound = checkGameState(move, indexTile, playerRound.getSign());
     if (endRound) {
       layoutController.deleteEventListenerBoard();
-      layoutController.openInfoRoundBox();
+      if (tie) {
+        layoutController.openInfoRoundBox(true, "", "");
+      } else {
+        layoutController.openInfoRoundBox(
+          false,
+          playerRound.getName(),
+          playerRound.getSign(),
+        );
+      }
     }
 
     playerRound = playerRound == player1 ? player2 : player1;
@@ -303,6 +334,7 @@ const gameManager = (function () {
       ) {
         finalRound = true;
         winnigGame = true;
+        tie = false;
         playerRound.updateWinningRounds();
         layoutController.colorWinningGame(poss);
         break;
@@ -310,7 +342,10 @@ const gameManager = (function () {
     }
 
     if (movesNumber === 9) {
-      if (!winnigGame) tiesNumber++;
+      if (!winnigGame) {
+        tiesNumber++;
+        tie = true;
+      }
       finalRound = true;
     }
 
