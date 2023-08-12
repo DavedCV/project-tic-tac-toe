@@ -47,6 +47,7 @@ const layoutController = (function () {
     gameInitializerButton = document.querySelector(
       ".game-initializer .start-button",
     ),
+    typeSelector = document.querySelector(".game-initializer .type-selector"),
     signSelector = document.querySelector(".game-initializer .sign-selector"),
     mainLayout = document.querySelector("main"),
     turnInfo = mainLayout.querySelector(".turn-info"),
@@ -61,8 +62,17 @@ const layoutController = (function () {
 
   // variables to keep track of the sign of the selected player in the start menu
   let startSignSelection = "";
+  let typeSelection = "";
 
   // -------------------------- event listeners --------------------------------
+
+  typeSelector.addEventListener("click", (e) => {
+    if (e.target.id === "human-human") typeSelection = "human-human";
+    else typeSelection = "human-ai";
+
+    if (typeSelection === "human-ai") signSelector.parentElement.classList.remove("disabled");
+    else signSelector.parentElement.classList.add("disabled");
+  });
 
   signSelector.addEventListener("click", (e) => {
     if (e.target.id === "sign-x") startSignSelection = "x";
@@ -72,7 +82,7 @@ const layoutController = (function () {
   // listener to the button that start the interaction between the layout manager
   // and the game manager
   gameInitializerButton.addEventListener("click", (e) => {
-    if (startSignSelection === undefined) return;
+    if (startSignSelection === undefined && typeSelection === "human-ai") return;
 
     // get the appropiate data for the players
     let firstPlayerSign,
@@ -86,6 +96,14 @@ const layoutController = (function () {
     } else {
       firstPlayerSign = "o";
       secondPlayerSign = "x";
+    }
+
+    if (typeSelection === "human-human"){
+      firstPlayerName = "player 1";
+      secondPlayerName = "player 2";
+    }else{
+      firstPlayerName = "Human";
+      secondPlayerName = "ai";
     }
 
     // create the player instances via the game manager, and start altering the

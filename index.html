@@ -76,7 +76,18 @@
             <i class="fa-solid fa-o fa-beat"></i>
         </div>
 
-        <section class="player-picker">
+        <section class="type-picker">
+            <h3>Pick game style</h3>
+            <section class="type-selector">
+                <input type="radio" name="game-type" id="human-human" class="select-type">
+                <input type="radio" name="game-type" id="human-ia" class="select-type">
+
+                <section class="h-h">human vs human</section>
+                <section class="h-ai">human vs AI</section>
+            </section>
+        </section>
+
+        <section class="player-picker disabled"> 
             <h3>Pick first player sign</h3>
             <section class="sign-selector">
                 <input type="radio" name="sign" id="sign-x" class="select-x">
