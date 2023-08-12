@@ -48,21 +48,14 @@ const layoutController = (function () {
     mainLayout = document.querySelector("main"),
     turnInfo = mainLayout.querySelector(".turn-info"),
     tiles = [...mainLayout.querySelectorAll(".tile")],
-    board = mainLayout.querySelector(".board");
+    board = mainLayout.querySelector(".board"),
+    overlay = document.querySelector(".overlay"),
+    infoRound = document.querySelector(".round-info");
 
   let firstPlayerSign,
     secondPlayerSign,
     firstPlayerName = "",
     secondPlayerName = "";
-
-  board.addEventListener("click", (e) => {
-    if (
-      !e.target.classList.contains("tile") ||
-      e.target.classList.contains("sign")
-    )
-      return;
-    gameManager.playRound(e.target);
-  });
 
   signSelector.addEventListener("click", (e) => {
     if (e.target.id === "sign-x") {
@@ -85,6 +78,7 @@ const layoutController = (function () {
     );
 
     updatePlayerData(firstPlayer);
+    addEventListenerBoard();
 
     animateButton(e.target);
 
@@ -93,6 +87,33 @@ const layoutController = (function () {
       mainLayout.classList.remove("disabled");
     }, 500);
   });
+
+  const openInfoRoundBox = () => {
+    infoRound.classList.add("active");
+    overlay.classList.add("active");
+  };
+
+  const closeInfoRoundBox = () => {
+    infoRound.classList.remove("active");
+    overlay.classList.remove("active");
+  };
+
+  const playRound = (e) => {
+    if (
+      !e.target.classList.contains("tile") ||
+      e.target.classList.contains("sign")
+    )
+      return;
+    gameManager.playRound(e.target);
+  };
+
+  const addEventListenerBoard = () => {
+    board.addEventListener("click", playRound);
+  };
+
+  const deleteEventListenerBoard = () => {
+    board.removeEventListener("click", playRound);
+  };
 
   const animateButton = (button) => {
     function removeTransition(e) {
@@ -129,14 +150,19 @@ const layoutController = (function () {
   };
 
   const colorWinningGame = (winningGame) => {
-    console.log(winningGame);
     const targetTiles = tiles.filter((tile) =>
       winningGame.includes(Number(tile.dataset.index)),
     );
     targetTiles.forEach((tile) => tile.classList.add("winning-tile"));
   };
 
-  return { markTile, updatePlayerData, colorWinningGame };
+  return {
+    markTile,
+    updatePlayerData,
+    colorWinningGame,
+    deleteEventListenerBoard,
+    openInfoRoundBox,
+  };
 })();
 
 const gameManager = (function () {
@@ -169,7 +195,11 @@ const gameManager = (function () {
 
     layoutController.markTile(tile, playerRound.getSign());
 
-    endRound = checkGameState(move, indexTile, playerRound.getSign());
+    const endRound = checkGameState(move, indexTile, playerRound.getSign());
+    if (endRound) {
+      layoutController.deleteEventListenerBoard();
+      layoutController.openInfoRoundBox();
+    }
 
     playerRound = playerRound == player1 ? player2 : player1;
     layoutController.updatePlayerData(playerRound);

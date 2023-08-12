@@ -25,6 +25,9 @@ html {
     text-transform: uppercase;
     letter-spacing: 2px;
     color: white;
+
+    width: 100vw;
+    height: 100vh;
 }
 
 /* set the layout of the page with grid */ 
@@ -239,7 +242,7 @@ main .board-container {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     border-radius: 2rem;
 
-    width: 80%;
+    width: min(750px,80%);
     height: 80%;
 
     padding: 2rem;
@@ -368,7 +371,78 @@ main .board-container {
     transform: rotate(-0.5turn);
 }
 
-/* JS dynamically added classes */
+/* ----------------------------- winner info -------------------------------- */
+
+/* style the box that displays who's the winner*/
+.round-info {
+    background-color: var(--light-blue);
+
+    width: 500px;
+    height: 300px;
+
+    border-radius: 2rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+
+    font-size: 3rem;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    z-index: 10;
+    transition: 200ms ease-in-out;
+}
+
+.round-info.active {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.overlay {
+    position: fixed;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    transition: 200ms ease-in-out;
+}
+
+.overlay.active {
+    position: all;
+    opacity: 1;
+}
+
+
+/* styel the buttons of the box*/
+.round-info .round-info-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+
+    width: 100%;
+}
+
+.round-info-buttons > button {
+    background-color: var(--dark-blue);
+    border-radius: 1rem;
+    border: none;
+
+    width: 30%;
+    height: 70px;
+}
+
+.round-info-buttons > button:hover {
+    background-color: var(--darker-blue);
+}
+
+/*-------------------- JS dynamically added classes --------------------------*/
 
 .clicked {
     transform: scale(0.95) translateY(5px);
