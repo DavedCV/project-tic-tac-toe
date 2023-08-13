@@ -134,6 +134,7 @@ button {
     right: 0;
 }
 
+/* style the text of the options in the type-selector section*/
 .game-initializer .type-selector section {
     display: flex;
     align-items: center;
@@ -150,7 +151,7 @@ button {
     background: url(./assets/xmark-solid-white.svg);
 }
 
-/* when the "x" sign is checked (radio button) change the background color */
+/* when the first is checked (radio button) change the background color */
 .game-initializer [class^="select-"]:first-of-type:checked ~ .sign--x,
 .game-initializer [class^="select-"]:first-of-type:checked ~ .h-h{
     background-color: var(--light-blue);
@@ -161,7 +162,7 @@ button {
     background: url(./assets/o-solid-white.svg);
 }
 
-/* when the "o" sign is checked (radio button) change the background color */
+/* when the second sign is checked (radio button) change the background color */
 .game-initializer [class^="select-"]:last-of-type:checked ~ .sign--o,
 .game-initializer [class^="select-"]:last-of-type:checked ~ .h-ai {
     background-color: var(--light-blue);
@@ -178,7 +179,7 @@ button {
     transition: 0.3s ease;
 }
 
-/* give som style to the button of the game-initializer*/
+/* give some style to the button of the game-initializer*/
 .game-initializer .start-button {
     height: 50px;
     width: 20%;
@@ -248,7 +249,6 @@ main .game-info {
     width: 60px;
 }
 
-
 /* Style the board */
 main .board-container {
     display: flex;
@@ -271,6 +271,7 @@ main .board-container {
     gap: 0.5rem;
 }
 
+/* style the tiles of the board */
 .board .tile {
     background-color: var(--ligter-blue);
     background-repeat: no-repeat;
@@ -320,7 +321,6 @@ main .board-container {
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
 }
 
-
 /* style every entry that reflects the important stats*/
 .stats-info .stat {
     height: 25%;
@@ -338,7 +338,7 @@ main .board-container {
     align-items: center;
 }
 
-/* display each player sign in an appropiate stat slot*/
+/* display each player sign with the name of the player aligned */
 .stats-info .stat > div {
     width: 100%;
     
@@ -346,6 +346,8 @@ main .board-container {
     justify-content: center;
     gap: 5px;
 }
+
+/* give some standart width to the sign */
 .stat .sign {
     width: 20px;
 
@@ -417,10 +419,12 @@ main .board-container {
     transition: 200ms ease-in-out;
 }
 
+/* show the round info section */
 .round-info.active {
     transform: translate(-50%, -50%) scale(1);
 }
 
+/* style the overlay when the info section is showing*/
 .overlay {
     position: fixed;
     opacity: 0;
@@ -434,13 +438,13 @@ main .board-container {
     z-index: 5;
 }
 
+/* active the overlay */
 .overlay.active {
     position: all;
     opacity: 1;
 }
 
-
-/* styel the buttons of the box*/
+/* style the buttons of the box*/
 .round-info .round-info-buttons {
     display: flex;
     justify-content: center;
@@ -464,6 +468,7 @@ main .board-container {
     background-color: var(--darker-blue);
 }
 
+/* style the text that the info section shows when visible */
 .round-info-text {
     display: flex;
     justify-content: center;

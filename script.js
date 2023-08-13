@@ -62,7 +62,7 @@ const Player = (playerName, playerSign) => {
 };
 
 /* Module that is in charge of the DOM manipulation through the game */
-const layoutController = (function () {
+const LayoutController = (function () {
   // ------------------------- module variables --------------------------------
 
   const gameInitializer = document.querySelector(".game-initializer"),
@@ -88,6 +88,7 @@ const layoutController = (function () {
 
   // -------------------------- event listeners --------------------------------
 
+  // listener to the type of game selector
   typeSelector.addEventListener("click", (e) => {
     if (e.target.id === "human-human") typeSelection = "human-human";
     else typeSelection = "human-ai";
@@ -97,6 +98,7 @@ const layoutController = (function () {
     else signSelector.parentElement.classList.add("disabled");
   });
 
+  // listener to the sign of the player selected when in the AI mode
   signSelector.addEventListener("click", (e) => {
     if (e.target.id === "sign-x") startSignSelection = "x";
     else startSignSelection = "o";
@@ -132,7 +134,7 @@ const layoutController = (function () {
 
     // create the player instances via the game manager, and start altering the
     // DOM based on the random selection of the first player
-    gameManager.setPlayers(
+    GameManager.setPlayers(
       firstPlayerName,
       firstPlayerSign,
       secondPlayerName,
@@ -155,14 +157,14 @@ const layoutController = (function () {
   buttonNextMatch.addEventListener("click", () => {
     closeInfoRoundBox();
     tiles.forEach((tile) => tile.setAttribute("class", "tile"));
-    gameManager.nextMatch();
+    GameManager.nextMatch();
   });
 
   // callback function to reset the game when a button with this objective is clicked
   const finishAll = () => {
     closeInfoRoundBox();
     tiles.forEach((tile) => tile.setAttribute("class", "tile"));
-    gameManager.resetGame();
+    GameManager.resetGame();
     mainLayout.classList.add("disabled");
     gameInitializer.classList.remove("disabled");
   };
@@ -232,14 +234,16 @@ const layoutController = (function () {
       return;
 
     markTile(e.target);
-    gameManager.playRound(e.target);
+    GameManager.playRound(e.target);
   };
 
+  // method to mark a tile when the AI makes a selection
   const aiMarkTile = (indexTile) => {
     const tile = tiles[indexTile];
     markTile(tile);
   };
 
+  // method to add the respective classes to the tile marked
   const markTile = (tile) => {
     animateButton(tile);
     tile.classList.add("sign");
@@ -296,7 +300,7 @@ const layoutController = (function () {
 
 /* Module that manages the general flow of the game and connect the DOM interface
 to the game board representation */
-const gameManager = (function () {
+const GameManager = (function () {
   // ---------------------------- module variables -----------------------------
 
   let player1, player2, playerRound;
@@ -317,7 +321,7 @@ const gameManager = (function () {
 
     firstMove();
 
-    layoutController.updatePlayerData(
+    LayoutController.updatePlayerData(
       playerRound.getSign(),
       playerRound.getName(),
     );
@@ -331,13 +335,13 @@ const gameManager = (function () {
   // method to play a round and update the info of the players, the game board,
   // and check the general state of the match
   const playRound = (tile) => {
+    
     let indexTile = 0;
-
     if (playerRound.getName() !== "ai") {
       indexTile = Number(tile.dataset.index);
     } else {
-      const bestMove = findBestMove(GameBoard.getCopyBoard(), 9 - move);
-      layoutController.aiMarkTile(bestMove);
+      const bestMove = findBestMove(GameBoard.getCopyBoard());
+      LayoutController.aiMarkTile(bestMove);
       indexTile = bestMove + 1;
     }
     GameBoard.setPosition(indexTile, playerRound.getSign());
@@ -349,11 +353,11 @@ const gameManager = (function () {
       playerRound.getSign(),
     );
     if (endRound) {
-      layoutController.deleteEventListenerBoard();
+      LayoutController.deleteEventListenerBoard();
       if (tie) {
-        layoutController.openInfoRoundBox(true, "", "");
+        LayoutController.openInfoRoundBox(true, "", "");
       } else {
-        layoutController.openInfoRoundBox(
+        LayoutController.openInfoRoundBox(
           false,
           playerRound.getName(),
           playerRound.getSign(),
@@ -362,7 +366,7 @@ const gameManager = (function () {
     }
 
     playerRound = playerRound == player1 ? player2 : player1;
-    layoutController.updatePlayerData(
+    LayoutController.updatePlayerData(
       playerRound.getSign(),
       playerRound.getName(),
     );
@@ -389,7 +393,7 @@ const gameManager = (function () {
         winnigGame = true;
         tie = false;
         playerRound.updateWinningRounds();
-        layoutController.colorWinningGame(poss);
+        LayoutController.colorWinningGame(poss);
         break;
       }
     }
@@ -417,32 +421,34 @@ const gameManager = (function () {
       oSignPlayerRounds = player1.getWinningRounds();
       xSignPlayerRounds = player2.getWinningRounds();
     }
-    layoutController.updateStatsInfo(
+    LayoutController.updateStatsInfo(
       xSignPlayerRounds,
       oSignPlayerRounds,
       tiesNumber,
     );
 
-    layoutController.updatePlayerData(
+    LayoutController.updatePlayerData(
       playerRound.getSign(),
       playerRound.getName(),
     );
-    layoutController.addEventListenerBoard();
+    LayoutController.addEventListenerBoard();
     GameBoard.resetFields();
     move = 0;
 
     if (playerRound.getName() === "ai") playRound();
   };
 
+  // method to reset the whole game when needed
   const resetGame = () => {
     player1 = player2 = playerRound = null;
     tiesNumber = move = 0;
     GameBoard.resetFields();
-    layoutController.updateStatsInfo(0, 0, 0);
+    LayoutController.updateStatsInfo(0, 0, 0);
   };
 
   /* --------- AI game decision and helper methods ---------------------------*/
 
+  // helper function to check wheter the games has a winner already or its a tie
   const checkWinner = (board) => {
     let winner;
 
@@ -464,19 +470,21 @@ const gameManager = (function () {
     else return "tie";
   };
 
+  // helper method to check if the board have free slots
   const isMovesLeft = (board) => {
     for (let i = 0; i < board.length; i++) if (board[i] === "") return true;
     return false;
   };
 
-  const findBestMove = (board, depth) => {
+  // entry point of the AI to select the best move given a bord
+  const findBestMove = (board) => {
     let maxScore = -Infinity;
     let maxMove = null;
 
     for (let i = 0; i < board.length; i++) {
       if (board[i] === "") {
         board[i] = player2.getSign();
-        let score = minimax(board, depth - 1, false);
+        let score = minimax(board, false);
         board[i] = "";
 
         if (score > maxScore) {
@@ -489,7 +497,9 @@ const gameManager = (function () {
     return maxMove;
   };
 
-  const minimax = (board, depth, aiPlayer) => {
+  // minimax function to get the combinations of the board recursively and select the best option
+  // alternating between players and assuming both players plays the best
+  const minimax = (board, aiPlayer) => {
     let winner = checkWinner(board);
 
     if (winner === "ai") return 10;
@@ -503,7 +513,7 @@ const gameManager = (function () {
       for (let i = 0; i < board.length; i++) {
         if (board[i] === "") {
           board[i] = player2.getSign();
-          bestScore = Math.max(bestScore, minimax(board, depth - 1, false));
+          bestScore = Math.max(bestScore, minimax(board, false));
           board[i] = "";
         }
       }
@@ -515,7 +525,7 @@ const gameManager = (function () {
       for (let i = 0; i < board.length; i++) {
         if (board[i] === "") {
           board[i] = player1.getSign();
-          bestScore = Math.min(bestScore, minimax(board, depth - 1, true));
+          bestScore = Math.min(bestScore, minimax(board, true));
           board[i] = "";
         }
       }
