@@ -116,7 +116,7 @@ const LayoutController = (function () {
       firstPlayerName = "",
       secondPlayerName = "";
 
-    if (e.target.id === "sign-x") {
+    if (startSignSelection === "x") {
       firstPlayerSign = "x";
       secondPlayerSign = "o";
     } else {
