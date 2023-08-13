@@ -2,6 +2,16 @@
 every round */
 const GameBoard = (() => {
   const board = ["", "", "", "", "", "", "", "", ""];
+  const winningCombinations = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9],
+    [1, 4, 7],
+    [2, 5, 8],
+    [3, 6, 9],
+    [1, 5, 9],
+    [3, 5, 7],
+  ];
 
   const setPosition = (position, sign) => {
     board[position - 1] = sign;
@@ -15,7 +25,19 @@ const GameBoard = (() => {
     board.forEach((entry, index, array) => (array[index] = ""));
   };
 
-  return { getPosition, setPosition, resetFields };
+  const getCopyBoard = () => {
+    return [...board];
+  };
+
+  const getWinningCombinations = () => winningCombinations;
+
+  return {
+    getPosition,
+    setPosition,
+    resetFields,
+    getCopyBoard,
+    getWinningCombinations,
+  };
 })();
 
 /* Factory functions to construct Player objects and keep track 
@@ -70,7 +92,8 @@ const layoutController = (function () {
     if (e.target.id === "human-human") typeSelection = "human-human";
     else typeSelection = "human-ai";
 
-    if (typeSelection === "human-ai") signSelector.parentElement.classList.remove("disabled");
+    if (typeSelection === "human-ai")
+      signSelector.parentElement.classList.remove("disabled");
     else signSelector.parentElement.classList.add("disabled");
   });
 
@@ -82,7 +105,8 @@ const layoutController = (function () {
   // listener to the button that start the interaction between the layout manager
   // and the game manager
   gameInitializerButton.addEventListener("click", (e) => {
-    if (startSignSelection === undefined && typeSelection === "human-ai") return;
+    if (startSignSelection === undefined && typeSelection === "human-ai")
+      return;
 
     // get the appropiate data for the players
     let firstPlayerSign,
@@ -98,11 +122,11 @@ const layoutController = (function () {
       secondPlayerSign = "x";
     }
 
-    if (typeSelection === "human-human"){
+    if (typeSelection === "human-human") {
       firstPlayerName = "player 1";
       secondPlayerName = "player 2";
-    }else{
-      firstPlayerName = "Human";
+    } else {
+      firstPlayerName = "human";
       secondPlayerName = "ai";
     }
 
@@ -211,6 +235,11 @@ const layoutController = (function () {
     gameManager.playRound(e.target);
   };
 
+  const aiMarkTile = (indexTile) => {
+    const tile = tiles[indexTile];
+    markTile(tile);
+  };
+
   const markTile = (tile) => {
     animateButton(tile);
     tile.classList.add("sign");
@@ -261,6 +290,7 @@ const layoutController = (function () {
     addEventListenerBoard,
     deleteEventListenerBoard,
     openInfoRoundBox,
+    aiMarkTile,
   };
 })();
 
@@ -270,7 +300,6 @@ const gameManager = (function () {
   // ---------------------------- module variables -----------------------------
 
   let player1, player2, playerRound;
-  let matchNumber = 0;
   let tiesNumber = 0;
   let tie = false;
   let move = 0;
@@ -280,17 +309,20 @@ const gameManager = (function () {
   // method to create the instances of the players and randomly select
   // the first player
   const setPlayers = (firstName, firstSign, secondName, secondSign) => {
-    if (firstName === "") player1 = Player("HUMAN", firstSign);
-    else player1 = Player(firstName, firstSign);
+    player1 = Player(firstName, firstSign);
+    player2 = Player(secondName, secondSign);
 
-    if (secondName === "") player2 = Player("AI", secondSign);
-    else player2 = Player(secondName, secondSign);
+    // console.log(player1.getName(), player1.getSign());
+    // console.log(player2.getName(), player2.getSign());
 
     firstMove();
+
     layoutController.updatePlayerData(
       playerRound.getSign(),
       playerRound.getName(),
     );
+
+    if (playerRound.getName() === "ai") playRound();
   };
   const firstMove = () => {
     playerRound = Math.random() >= 0.5 ? player1 : player2;
@@ -299,12 +331,23 @@ const gameManager = (function () {
   // method to play a round and update the info of the players, the game board,
   // and check the general state of the match
   const playRound = (tile) => {
+    let indexTile = 0;
+
+    if (playerRound.getName() !== "ai") {
+      indexTile = Number(tile.dataset.index);
+    } else {
+      const bestMove = findBestMove(GameBoard.getCopyBoard(), 9 - move);
+      layoutController.aiMarkTile(bestMove);
+      indexTile = bestMove + 1;
+    }
+    GameBoard.setPosition(indexTile, playerRound.getSign());
     move++;
 
-    const indexTile = Number(tile.dataset.index);
-    GameBoard.setPosition(indexTile, playerRound.getSign());
-
-    const endRound = checkGameState(move, indexTile, playerRound.getSign());
+    const endRound = checkGameStateAfterMove(
+      move,
+      indexTile,
+      playerRound.getSign(),
+    );
     if (endRound) {
       layoutController.deleteEventListenerBoard();
       if (tie) {
@@ -323,24 +366,16 @@ const gameManager = (function () {
       playerRound.getSign(),
       playerRound.getName(),
     );
+
+    if (playerRound.getName() === "ai" && !endRound) playRound();
   };
 
   // method to check the game state after every move
-  const checkGameState = (movesNumber, indexTile) => {
-    const winningCombinations = [
-      [1, 2, 3],
-      [4, 5, 6],
-      [7, 8, 9],
-      [1, 4, 7],
-      [2, 5, 8],
-      [3, 6, 9],
-      [1, 5, 9],
-      [3, 5, 7],
-    ];
+  const checkGameStateAfterMove = (movesNumber, indexTile) => {
     let finalRound = false;
     let winnigGame = false;
 
-    const possibilities = winningCombinations.filter((poss) =>
+    const possibilities = GameBoard.getWinningCombinations().filter((poss) =>
       poss.includes(indexTile),
     );
 
@@ -395,14 +430,98 @@ const gameManager = (function () {
     layoutController.addEventListenerBoard();
     GameBoard.resetFields();
     move = 0;
-    matchNumber++;
+
+    if (playerRound.getName() === "ai") playRound();
   };
 
   const resetGame = () => {
     player1 = player2 = playerRound = null;
-    matchNumber = tiesNumber = move = 0;
+    tiesNumber = move = 0;
     GameBoard.resetFields();
     layoutController.updateStatsInfo(0, 0, 0);
+  };
+
+  /* --------- AI game decision and helper methods ---------------------------*/
+
+  const checkWinner = (board) => {
+    let winner;
+
+    for (let comb of GameBoard.getWinningCombinations()) {
+      const baseSign = board[comb[0] - 1];
+      if (
+        comb.every((element) => board[element - 1] === baseSign) &&
+        baseSign != ""
+      ) {
+        winner =
+          baseSign === player1.getSign()
+            ? player1.getName()
+            : player2.getName();
+        break;
+      }
+    }
+
+    if (winner) return winner;
+    else return "tie";
+  };
+
+  const isMovesLeft = (board) => {
+    for (let i = 0; i < board.length; i++) if (board[i] === "") return true;
+    return false;
+  };
+
+  const findBestMove = (board, depth) => {
+    let maxScore = -Infinity;
+    let maxMove = null;
+
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] === "") {
+        board[i] = player2.getSign();
+        let score = minimax(board, depth - 1, false);
+        board[i] = "";
+
+        if (score > maxScore) {
+          maxScore = score;
+          maxMove = i;
+        }
+      }
+    }
+
+    return maxMove;
+  };
+
+  const minimax = (board, depth, aiPlayer) => {
+    let winner = checkWinner(board);
+
+    if (winner === "ai") return 10;
+    else if (winner === "human") return -10;
+
+    if (!isMovesLeft(board)) return 0;
+
+    if (aiPlayer) {
+      let bestScore = -Infinity;
+
+      for (let i = 0; i < board.length; i++) {
+        if (board[i] === "") {
+          board[i] = player2.getSign();
+          bestScore = Math.max(bestScore, minimax(board, depth - 1, false));
+          board[i] = "";
+        }
+      }
+
+      return bestScore;
+    } else {
+      let bestScore = Infinity;
+
+      for (let i = 0; i < board.length; i++) {
+        if (board[i] === "") {
+          board[i] = player1.getSign();
+          bestScore = Math.min(bestScore, minimax(board, depth - 1, true));
+          board[i] = "";
+        }
+      }
+
+      return bestScore;
+    }
   };
 
   return { setPlayers, playRound, nextMatch, resetGame };
